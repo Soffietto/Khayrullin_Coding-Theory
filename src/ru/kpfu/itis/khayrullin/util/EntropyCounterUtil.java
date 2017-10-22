@@ -47,7 +47,7 @@ public class EntropyCounterUtil {
                     Double value = o1.getValue();
                     String beginning = o1.getKey().substring(1);
                     Double charValue = firstCharProbabilities.get(beginning);
-                    return value * Math.log(value / charValue) / Math.log(2.0); //p(ab)*log(2)p(a|b)
+                    return value * Math.log(value / charValue) / Math.log(2.0);
                 })
                 .sum();
     }
