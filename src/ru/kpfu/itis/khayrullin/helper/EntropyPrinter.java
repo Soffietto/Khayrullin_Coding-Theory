@@ -15,7 +15,7 @@ public class EntropyPrinter {
         for (int i = 0; i < conditionPower; i++) {
             stringBuilder.append(String.format("U%s", i + 1));
             if (i != conditionPower - 1) {
-                stringBuilder.append(",");
+                stringBuilder.append(", ");
             }
         }
         stringBuilder.append(String.format(") = %s", doubleEntropy));

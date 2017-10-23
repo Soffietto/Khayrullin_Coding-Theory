@@ -16,10 +16,10 @@ public class EntropyCounterUtil {
         }
         Pair<Map<String, Double>, Long> firstCharPair = FileReaderUtil.getStringProbabilities(fileName, conditionPower - 1);
         Pair<Map<String, Double>, Long> secondCharPair = FileReaderUtil.getStringProbabilities(fileName, conditionPower);
-        Map<String, Double> twoCharProbabilities = firstCharPair.getKey();
-        Map<String, Double> threeCharProbabilities = secondCharPair.getKey();
-        Double entropy = entrupyCounter(twoCharProbabilities, threeCharProbabilities);
-        return new Entropy((-1) * entropy, threeCharProbabilities, firstCharPair.getValue() + conditionPower - 2);
+        Map<String, Double> firstProbability = firstCharPair.getKey();
+        Map<String, Double> secondProbability = secondCharPair.getKey();
+        Double entropy = entropyCounter(firstProbability, secondProbability);
+        return new Entropy((-1) * entropy, secondProbability, firstCharPair.getValue() + conditionPower - 2);
     }
 
     public static Double fullEntropyCounter(Entropy entropy) {
@@ -40,7 +40,7 @@ public class EntropyCounterUtil {
                 .sum();
     }
 
-    private static Double entrupyCounter(Map<String, Double> firstCharProbabilities, Map<String, Double> secondCharProbabilities) {
+    private static Double entropyCounter(Map<String, Double> firstCharProbabilities, Map<String, Double> secondCharProbabilities) {
         return secondCharProbabilities.entrySet()
                 .stream()
                 .mapToDouble((o1) -> {
