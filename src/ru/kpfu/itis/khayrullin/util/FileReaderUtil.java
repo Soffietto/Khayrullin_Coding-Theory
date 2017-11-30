@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class FileReaderUtil {
 
-    private static Pair<Map<String, Long>, Long> stringMapCreator(String fileName, Integer charCount) throws IOException {
+    public static Pair<Map<String, Long>, Long> stringMapCreator(String fileName, Integer charCount) throws IOException {
         Map<String, Long> stringLongMap = new HashMap<>();
         Reader reader = new InputStreamReader(FileReaderUtil.class.getClassLoader().getResourceAsStream(fileName));
         Long sum = 0L;
@@ -49,6 +49,17 @@ public class FileReaderUtil {
             probabilities.put(string, aLong / (double) sumOfStrings);
         });
         return new Pair<>(probabilities, sumOfStrings);
+    }
+
+    public static String getTextString(String fileName) throws IOException {
+        Reader reader = new InputStreamReader(FileReaderUtil.class.getClassLoader().getResourceAsStream(fileName));
+        StringBuilder resultString = new StringBuilder();
+        int readedInt = 0;
+        while (readedInt != -1) {
+            readedInt = reader.read();
+            resultString.append((char) readedInt);
+        }
+        return resultString.toString();
     }
 
 }
