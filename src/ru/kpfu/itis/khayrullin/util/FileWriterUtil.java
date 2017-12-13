@@ -8,6 +8,7 @@ import ru.kpfu.itis.khayrullin.util.huffman.HuffmanCodeUtil;
 import ru.kpfu.itis.khayrullin.util.huffman.HuffmanQueue;
 import ru.kpfu.itis.khayrullin.util.shannonfano.ShannonFanoCodeUtil;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -54,7 +55,23 @@ public class FileWriterUtil {
                 charCount);
         FileOutputStream fileOutputStream = new FileOutputStream(outputPath);
         byte[] byteText = (new BigInteger(bitText, 2)).toByteArray();
-        EntropyPrinter.entropyPrint(fileName, 1);
+        EntropyPrinter.entropyPrint(fileName, charCount);
+        System.out.println("Bits per symbol: " + (double) (byteText.length * 8) / (double) text.length());
+        fileOutputStream.write(byteText);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+    }
+
+    public static void generateArithmeticCode(String fileName, int charCount) throws IOException {
+        String text = FileReaderUtil.getTextString(fileName);
+        String code = ArithmeticCodingUtil.getArithmeticCodes(fileName, charCount);
+        String bitText = new BigInteger(code).toString(2);
+        String outputPath = String.format("resources/output/%s_arithmetic_output_%s.bin",
+                fileName.substring(6, fileName.length() - 4).replaceAll("\\s", "_"),
+                charCount);
+        FileOutputStream fileOutputStream = new FileOutputStream(outputPath);
+        byte[] byteText = (new BigInteger(bitText, 2)).toByteArray();
+        EntropyPrinter.entropyPrint(fileName, charCount);
         System.out.println("Bits per symbol: " + (double) (byteText.length * 8) / (double) text.length());
         fileOutputStream.write(byteText);
         fileOutputStream.flush();
