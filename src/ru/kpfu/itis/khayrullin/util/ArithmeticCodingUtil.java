@@ -1,20 +1,17 @@
 package ru.kpfu.itis.khayrullin.util;
 
+import ru.kpfu.itis.khayrullin.entity.AdaptiveArithNode;
 import ru.kpfu.itis.khayrullin.entity.ArithmeticCodingNode;
-import ru.kpfu.itis.khayrullin.helper.Pair;
 import ru.kpfu.itis.khayrullin.helper.TextSplitter;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class ArithmeticCodingUtil {
@@ -22,8 +19,7 @@ public class ArithmeticCodingUtil {
     private static BigDecimal currentLow;
     private static BigDecimal currentHigh;
 
-    private static Integer adaptiveSize;
-    private static BigDecimal currentIntervalSize = new BigDecimal("1");
+    private static String text = "";
 
     public static String getArithmeticCodes(String fileName, int charCount) throws IOException {
         currentLow = new BigDecimal(0);
@@ -51,29 +47,67 @@ public class ArithmeticCodingUtil {
         return getResult().substring(2);
     }
 
-    public static String getAdaptiveArithmetic(String fileName, Reader fileReader) throws IOException {
+    public static String getAdaptiveArithmetic(String fileName) throws IOException {
         Set<String> stringSet = FileReaderUtil.getStringProbabilities(fileName, 1)
                 .getKey().keySet();
         Map<String, Integer> charCount = new HashMap<>();
         for (String string : stringSet) {
             charCount.put(string, 1);
         }
-        adaptiveSize = stringSet.size();
-        adaptiveCount(charCount, fileReader);
-        //TODO: Доделать!
-        return null;
+        text = FileReaderUtil.getTextString(fileName);
+        return stepIntoAdapt(0, charCount, charCount.size(), 0.0, 1.0);
     }
 
-    private static void adaptiveCount(Map<String, Integer> charCount, Reader fileReader) throws IOException {
-        int readChar = fileReader.read();
-        //TODO: Доделать!!!
-
+    private static String stepIntoAdapt(Integer k, Map<String, Integer> sym, Integer symNum, Double start, Double end) {
+        try{
+            String currSymbol = (text.substring(k, k + 1));
+            Set<String> keySey = sym.keySet();
+            ArrayList<String> symList = new ArrayList<>(keySey);
+            HashMap<String, Double> symWithVer = new HashMap<>();
+            for (int i = 0; i < symList.size(); i++) {
+                if (symList.get(i).length() == 1) {
+                    String currSym = symList.get(i);
+                    symWithVer.put(symList.get(i), sym.get(currSym) / (double)symNum);
+                }
+            }
+            ArrayList<AdaptiveArithNode> newSymList = new ArrayList<>();
+            Double oneSymPoint = 0.0;
+            for (String symbol : symList) {
+                newSymList.add(new AdaptiveArithNode(symbol, symWithVer.get(symbol), oneSymPoint, oneSymPoint + (symWithVer.get(symbol))));
+                oneSymPoint = oneSymPoint + symWithVer.get(symbol);
+            }
+            AdaptiveArithNode currSym = newSymList.get(newSymList.indexOf(new AdaptiveArithNode(currSymbol)));
+            String result = "";
+            Double newStart = start + (end - start) * currSym.getlProbability();
+            Double newEnd = start + (end - start) * currSym.getrProbability();
+            String newStartString = String.valueOf(newStart);
+            String newEndString = String.valueOf(newEnd);
+            int i = 2;
+            while (newStartString.length() > i && newStartString.substring(0, i).equals(newEndString.substring(0, i))) {
+                i++;
+            }
+            if (newStartString.length() > i + 2 && !newStartString.substring(i - 1, i + 2).equals("000")) {
+                newStart = Double.valueOf("0." + newStartString.substring(i - 1));
+                newEnd = Double.valueOf("0." + newEndString.substring(i - 1));
+                result = result + newEndString.substring(2, i - 1);
+            }
+            symNum++;
+            sym.replace(currSymbol, sym.get(currSymbol) + 1);
+            if (k != text.length() - 2) {
+                return result + stepIntoAdapt(k + 1, sym, symNum, newStart, newEnd);
+            } else {
+                return result + newEndString.charAt(i - 1);
+            }
+        }catch (StackOverflowError er) {
+            System.out.println(k);
+            return null;
+        }
     }
 
     private static List<ArithmeticCodingNode> mapSplitter(Map<String, Double> probabilities) {
         List<Map.Entry<String, Double>> sortedMap = probabilities.entrySet().stream()
                 .sorted((o1, o2) -> {
-                    if(o1.getValue().compareTo(o2.getValue()) == 0) {
+                    if (o1.getValue().compareTo(o2.getValue()) == 0) {
                         return o1.getKey().compareTo(o2.getKey());
                     }
                     return (-1) * o1.getValue().compareTo(o2.getValue());

@@ -78,6 +78,21 @@ public class FileWriterUtil {
         fileOutputStream.close();
     }
 
+    public static void generateAdaptiveArithCode(String fileName) throws IOException {
+        String text = FileReaderUtil.getTextString(fileName);
+        String code = ArithmeticCodingUtil.getAdaptiveArithmetic(fileName);
+        String bitText = new BigInteger(code).toString(2);
+        String outputPath = String.format("resources/output/%s_arithmetic_adaptive_output.bin",
+                fileName.substring(6, fileName.length() - 4).replaceAll("\\s", "_"));
+        FileOutputStream fileOutputStream = new FileOutputStream(outputPath);
+        byte[] byteText = (new BigInteger(bitText, 2)).toByteArray();
+        EntropyPrinter.entropyPrint(fileName, 1);
+        System.out.println("Bits per symbol: " + (double) (byteText.length * 8) / (double) text.length());
+        fileOutputStream.write(byteText);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+    }
+
     private static String getBitText(Map<String, String> codes, String text, int charCount) {
         StringBuilder bitStringBuilder = new StringBuilder();
         for (int i = 0; i < text.length() - charCount; i += charCount) {

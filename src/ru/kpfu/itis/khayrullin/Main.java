@@ -12,7 +12,6 @@ public class Main {
     private static final String NEW_FILE_NAME = "new file.txt";
 
     public static void main(String[] args) throws IOException, ParseException {
-//        FileWriterUtil.generateArithmeticCode(FILE_NAME, 1);
-//        FileWriterUtil.generateArithmeticCode(FILE_NAME, 2);
+        FileWriterUtil.generateAdaptiveArithCode(FILE_NAME);
     }
 }
